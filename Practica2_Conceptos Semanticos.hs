@@ -44,9 +44,15 @@ type Estado = [String]
 
 --3.2 Ejericios
 
--- Ejercicio 1
+-- Funcion que sirve para obtener las variables en una formula proposicional
 variables :: Prop -> [String]
-variables = undefined
+variables (Var x) = [x]
+variables (Cons _) = []
+variables (Not p) = variables p
+variables (And p q) = variables p ++ variables q
+variables (Or p q) = variables p ++ variables q
+variables (Impl p q) = variables p ++ variables q
+variables (Syss p q) = variables p ++ variables q
 
 -- Ejercicio 2
 conjPotencia :: [a] -> [[a]]
