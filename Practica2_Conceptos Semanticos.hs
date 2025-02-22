@@ -56,7 +56,8 @@ variables (Syss p q) = variables p ++ variables q
 
 -- Ejercicio 2
 conjPotencia :: [a] -> [[a]]
-conjPotencia = undefined
+conjPotencia [] = [[]]
+conjPotencia(x:xs) = [x:ys | ys <- conjPotencia xs] ++ conjPotencia xs
 
 -- Ejercicio 3
 interpretacion :: Prop -> Estado -> Bool
