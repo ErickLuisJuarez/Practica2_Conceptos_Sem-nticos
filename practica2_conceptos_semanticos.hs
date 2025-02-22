@@ -8,7 +8,7 @@ module Practica02 where
 
 -- 3.1 Sintaxis de la lógica proposicional
 
--- Se efine el t ipo de dato Prop
+-- Se efine el tipo de dato Prop
 data Prop = 
     Var String |
     Cons Bool |
@@ -56,7 +56,8 @@ variables (Syss p q) = variables p ++ variables q
 
 -- Ejercicio 2
 conjPotencia :: [a] -> [[a]]
-conjPotencia = undefined
+conjPotencia [] = [[]]
+conjPotencia(x:xs) = [x:ys | ys <- conjPotencia xs] ++ conjPotencia xs
 
 -- Ejercicio 3
 interpretacion :: Prop -> Estado -> Bool
