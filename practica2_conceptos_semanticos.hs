@@ -1,5 +1,6 @@
 module Practica02 where
-
+-- Se importan las funciones nub y sort de la libreria Data.List para eliminar los elementos repetidos de una lista y ordenarla
+import Data.List(nub, sort)
 -- Practica 2: Conceptos Semanticos 
 
 -- Integrantes: Luis Juárez Erick
@@ -41,56 +42,65 @@ u = Var "u"
 
 -- Se implementa un estado
 type Estado = [String]
-
 --3.2 Ejericios
 
 -- Funcion que sirve para obtener las variables en una formula proposicional
+
 variables :: Prop -> [String]
 variables (Var x) = [x]
 variables (Cons _) = []
 variables (Not p) = variables p
-variables (And p q) = variables p ++ variables q
-variables (Or p q) = variables p ++ variables q
-variables (Impl p q) = variables p ++ variables q
-variables (Syss p q) = variables p ++ variables q
+variables (And p q) = nub (variables p ++ variables q)
+variables (Or p q) = nub (variables p ++ variables q)
+variables (Impl p q) = nub (variables p ++ variables q)
+variables (Syss p q) = nub (variables p ++ variables q)
 
--- Ejercicio 2
+-- Funcion que sirve para obtener el conjunto potencia de una lista
 conjPotencia :: [a] -> [[a]]
 conjPotencia [] = [[]]
 conjPotencia(x:xs) = [x:ys | ys <- conjPotencia xs] ++ conjPotencia xs
 
--- Ejercicio 3
+-- Funcion que sirve para obtener la interpretacion de una formula proposicional bajo un estado
 interpretacion :: Prop -> Estado -> Bool
-interpretacion = undefined
+-- Para asignarle el valor de verdad a una variable verificamos que pertenezca al conjunto de estados (si pertenece es True, si no es False)
+interpretacion (Var x) e = elem x e
+interpretacion (Cons b) _ = b
+interpretacion (Not p) e = not (interpretacion p e)
+interpretacion (And p q) e = interpretacion p e && interpretacion q e
+interpretacion (Or p q) e = interpretacion p e || interpretacion q e
+interpretacion (Impl p q) e = not (interpretacion p e) || interpretacion q e
+interpretacion (Syss p q) e = interpretacion p e == interpretacion q e
 
--- Ejercicio 4
+-- Funcion que sirve para obtener los estados posibles de una formula proposicional
 estadosPosibles :: Prop -> [Estado]
-estadosPosibles = undefined
+estadosPosibles p = conjPotencia (variables p)
 
--- Ejercicio 5
+-- Funcion que sirve para obtener los modelos de una formula proposicional (Estados que hacen verdadera la formula)
 modelos :: Prop -> [Estado]
-modelos = undefined
+modelos p = [e | e <- estadosPosibles p, interpretacion p e]
 
--- Ejercicio 6
+-- Funcion que sirve para verificar si dos formulas proposicionales son equivalentes (si tienen los mismos modelos)
 sonEquivalentes :: Prop -> Prop -> Bool
-sonEquivalentes = undefined
+-- Ordenamos los elementes de los modelos para verificar si son iguales (asi evitamos que marque falso si los estados o modelos estan en diferente orden)
+sonEquivalentes p q = sort (map sort (modelos p)) == sort (map sort (modelos q))
 
--- Ejercicio 7
+
+-- Funcion que sirve para verificar si una formula proposicional es una tautologia
 tautologia :: Prop -> Bool
-tautologia = undefined
+tautologia p = and [interpretacion p e | e <- estadosPosibles p]
 
--- Ejercicio 8
+-- Funcion que sirve para verificar si una formula proposicional es una contradiccion
 contradiccion :: Prop -> Bool
-contradiccion = undefined
+contradiccion p = and [not (interpretacion p e) | e <- estadosPosibles p]
 
--- Ejercicio 9
+-- Funcion que sirve para verificar si una formula proposicional es una contingencia
 contingencia :: Prop -> Bool 
-contingencia = undefined
+contingencia p = not (tautologia p) && not (contradiccion p)
 
--- Ejercicio 10
+-- Funcion que sirve para verificar si un estado es un modelo de una formula propoisional (si hace verdadera la formula)
 esModelo :: Estado -> Prop -> Bool
-esModelo = undefined
+esModelo e p = interpretacion p e
 
--- Ejercicio 11
+-- Funcion que sirve para verificar si una formula proposicional es satisfacible
 esSatisfacible :: Prop -> Bool
-esSatisfacible = undefined
+esSatisfacible p = or [interpretacion p e | e <- estadosPosibles p]
